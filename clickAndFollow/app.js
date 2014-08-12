@@ -1,3 +1,8 @@
+
+/**
+ * Module dependencies.
+ */
+
 var express = require('express');
 var path = require('path');
 var favicon = require('static-favicon');
@@ -13,6 +18,7 @@ var app = express();
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
+app.set('port', process.env.PORT || 3000);
 
 app.use(favicon());
 app.use(logger('dev'));
@@ -60,6 +66,9 @@ app.use(function(err, req, res, next) {
 module.exports = app;
 
 if (!module.parent) {
-  app.listen(3000);
-  console.log('Express started on port 3000');
+
+	http.createServer(app).listen(app.get('port'), function(){
+	  console.log('Express server listening on port ' + app.get('port'));
+	});
+
 }
