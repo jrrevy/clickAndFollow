@@ -9,10 +9,14 @@ var favicon = require('static-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var expressValidator = require('express-validator');
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
 var choose = require('./routes/choose');
+var validate = require('./routes/validate');
+var congrats = require('./routes/congrats');
+
 
 var app = express();
 
@@ -25,6 +29,8 @@ app.use(favicon());
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded());
+app.use(expressValidator());  //required for Express-Validator
+
 app.use(cookieParser());
 app.use(require('stylus').middleware(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'public')));
@@ -32,7 +38,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', routes);
 app.use('/users', users);
 app.use('/choose', choose);
+app.use('/validate', validate);
+app.use('/congrats', congrats);
 
+	
 /// catch 404 and forward to error handler
 app.use(function(req, res, next) {
     var err = new Error('Not Found');

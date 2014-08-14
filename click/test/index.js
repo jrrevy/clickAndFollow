@@ -10,14 +10,4 @@ describe('index', function(){
         .expect(/Click\ an\ image\ App/, done)
     })
   })
-  
-  describe('GET /', function(){
-    it('should find 3 links to choose page',  function(done){
-        request(app)
-        .get('/')
-        .expect(/href=\"\/choose\/ipad.png/)
-        .expect(/href=\"\/choose\/dog.png/)
-        .expect(/href=\"\/choose\/phones.png/, done)
-    })
-  })
 })
