@@ -25,10 +25,85 @@
         <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
 
+    
+    <script src="/jquery.js"></script>
+    <script src="socket.io/socket.io.js" type="text/javascript" charset="utf-8"></script>
+    
+    <script type="text/javascript" charset="utf-8">
+   
+      function move(data){
+        mover = $(document.createElement('div')).
+          addClass('cursor').
+          css({
+            'background-color': data.color,
+            'left': data.x,
+            'top': data.y
+          }).
+          html('&nbsp;');
+        $(document.body).append( mover );
+        mover.fadeOut();
+      }
+      window.my_color=null;
+      function set_color(data) {
+        window.my_color = data.color;
+      }
+      
+      var socket = io();
+      socket.on('message', function(data) {
+    	  console.log("message event invoked");
+	      var data = JSON.parse(data);
+	      
+	      if (data.event) {
+	          if (data.event == 'movement') {
+	        	  console.log("for a move");
+	            move( data );
+	          } else if ( data.event == 'color' ) {
+	        	  console.log("for a color");
+	            set_color( data );
+	          }
+	      }
+      });
+      
+      socket.on('color', function(message) {
+    	  console.log("color event invoked");
+          /*var data = eval( '('+$.map(data, function(e,i) {
+            return String.fromCharCode(e);
+          }).join('')+')' );*/
+    	  var data = JSON.parse(message)
+          console.log("color was : " + window.my_color);
+          set_color( data );
+          console.log(", now it is :" +  window.my_color)
+       });
+      
+      // Deal with mouse movements
+      $(function(){
+        $(document).mousemove(function(it){
+          socket.send({
+            event: 'mousemove',
+            x: it.pageX,
+            y: it.pageY,
+            color: (window.my_color ? window.my_color : null)
+          });
+        });
+      });
+    </script> 
+    <style type="text/css">
+      div.cursor {
+        font-family: fixed;
+      	font-size: 13px;
+      	border: 1px solide green;
+        height: 5px;
+        width: 5px;
+        position:absolute;
+      	z-index:999;
+      	background-color:red;
+      }
+    </style>
 
   </head>
-  <body>	
-	 <!-- Navigation -->
+  <body>
+  		
+  	<!-- Navigation -->
     <% include layout/navigation %>
 
     <!-- Header -->
@@ -39,8 +114,6 @@
   
    <% include layout/footer %>
 
-    <!-- jQuery Version 1.11.0 -->
-    <script src="js/jquery-1.11.0.js"></script>
 
     <!-- Bootstrap Core JavaScript -->
     <script src="js/bootstrap.min.js"></script>

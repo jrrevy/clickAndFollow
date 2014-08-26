@@ -10,6 +10,8 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var expressValidator = require('express-validator');
+var http 			= require('http');
+var socketio      	= require('socket.io');
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
@@ -74,12 +76,69 @@ app.use(function(err, req, res, next) {
 });
 
 
+
 module.exports = app;
+var server = http.Server(app);
 
 if (!module.parent) {
-
-	http.createServer(app).listen(app.get('port'), function(){
-	  console.log('Express server listening on port ' + app.get('port'));
-	});
-
+	var server = http.createServer(app).listen(app.get('port'), function(){
+		  console.log('Express server listening on port ' + app.get('port'));
+		});		
 }
+
+//var sessions = {}
+
+var io = socketio.listen(server);
+
+io.on('connection', function(client){
+	
+	var address = client.handshake.address;
+    console.log("New connection from " + address.address + ":" + address.port);
+    
+    //Notify his color to the new client
+    client.color = getColor();
+    var colorMessage = '{"color": "'+client.color+'"}';
+    
+    console.log('New client ' + client.id + ' taking a new color : ' + client.color + ", emitting \ " +colorMessage );
+
+    client.emit('color', colorMessage);
+    
+    // - - - - - - - - - - - - - - - - - 
+    // Message event
+    client.on('message', function(data){
+      if (data.color) {
+          var message = '{ "event": "movement", "color": "'+data.color+'", "x": '+data.x+', "y": '+data.y+' }';
+    	  console.log('on message : ' + message);
+    	  client.broadcast.emit('message',message);
+    	  //io.emit('message',message);
+      } else if (client.color) {
+          var message = '{ "event": "movement", "color": "'+client.color+'", "x": '+data.x+', "y": '+data.y+' }';
+    	  console.log('on message : ' +message);
+    	  client.broadcast.emit('message',message);
+    	  //io.emit('message',message);
+      } else {
+    	  console.log('on message without color : ');
+      }
+   });
+    
+    // - - - - - - - - - - - - - - - - - 
+    // Disconnect event
+    client.on('disconnect', function () {
+        // remove the user from global session list
+	    // TODO
+        console.log('Client ' + client.id + 'has left,  releasing color : ' + client.color);
+        addColor(client.color);
+     
+    });
+});
+
+//Define socket connexions
+colors = ['blue', 'green', 'red', 'yellow', 'azure', 'brown', 'cyan', 'lime', 'navy', 'olive'];
+function getColor(){
+	  return colors.pop();
+}
+// Add a new socket color connexion
+function addColor(color){
+	  return colors.push(color);
+}
+
