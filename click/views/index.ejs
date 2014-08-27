@@ -27,66 +27,14 @@
 
     
     <script src="/jquery.js"></script>
+    <script src="/clickAndFollow.js"></script>
     <script src="socket.io/socket.io.js" type="text/javascript" charset="utf-8"></script>
     
     <script type="text/javascript" charset="utf-8">
-   
-      function move(data){
-        mover = $(document.createElement('div')).
-          addClass('cursor').
-          css({
-            'background-color': data.color,
-            'left': data.x,
-            'top': data.y
-          }).
-          html('&nbsp;');
-        $(document.body).append( mover );
-        mover.fadeOut();
-      }
-      window.my_color=null;
-      function set_color(data) {
-        window.my_color = data.color;
-      }
-      
-      var socket = io();
-      socket.on('message', function(data) {
-    	  console.log("message event invoked");
-	      var data = JSON.parse(data);
-	      
-	      if (data.event) {
-	          if (data.event == 'movement') {
-	        	  console.log("for a move");
-	            move( data );
-	          } else if ( data.event == 'color' ) {
-	        	  console.log("for a color");
-	            set_color( data );
-	          }
-	      }
-      });
-      
-      socket.on('color', function(message) {
-    	  console.log("color event invoked");
-          /*var data = eval( '('+$.map(data, function(e,i) {
-            return String.fromCharCode(e);
-          }).join('')+')' );*/
-    	  var data = JSON.parse(message)
-          console.log("color was : " + window.my_color);
-          set_color( data );
-          console.log(", now it is :" +  window.my_color)
-       });
-      
-      // Deal with mouse movements
-      $(function(){
-        $(document).mousemove(function(it){
-          socket.send({
-            event: 'mousemove',
-            x: it.pageX,
-            y: it.pageY,
-            color: (window.my_color ? window.my_color : null)
-          });
-        });
-      });
+    	window.my_color = null;
+    	clickAndFollow();
     </script> 
+    
     <style type="text/css">
       div.cursor {
         font-family: fixed;
