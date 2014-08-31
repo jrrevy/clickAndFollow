@@ -32,7 +32,7 @@
     
     <script type="text/javascript" charset="utf-8">
     	window.my_color = null;
-    	clickAndFollow();
+    	clickAndFollow(<%=admin%>);
     </script> 
     
     <style type="text/css">
@@ -59,7 +59,28 @@
 
     <!-- Page Content -->
 
-  
+    <div class="container">
+
+    <div class="row">
+        <div class="col-lg-5 col-sm-6">
+            <div class="clearfix"></div>
+            <form method="post" class="form-horizontal">
+            	<div class="form-group">
+					<label for="email" class="control-label col-xs-2">Email</label>
+					<div class="col-xs-10">
+    					<input type="email" class="form-control" name="email" id="email" placeholder="Email">
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="col-xs-offset-2 col-xs-10">
+    				<button type="submit" class="btn btn-primary">Auth as admin</button>
+					 </div>
+            </form>
+        </div>
+        <div class="col-lg-5 col-lg-offset-2 col-sm-6">
+            <p />
+        </div>
+    </div>
    <% include layout/footer %>
 
 

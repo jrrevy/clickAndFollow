@@ -12,13 +12,17 @@ function set_color(data) {
 	window.my_color = data.color;
 }
 
+
+
 // - - - - - - - - - - - - - - - - - - - - - - - -
 // Main script for mouse following
 // - - - - - - - - - - - - - - - - - - - - - - - -
 
-function clickAndFollow() {
+function clickAndFollow(isAdmin) {
+	isAdmin = typeof isAdmin !== 'undefined' ? isAdmin : false;
+	
 	var socket = io();
-	socket.on('message', function(data) {
+	socket.on('move', function(data) {
 		var data = JSON.parse(data);
 		move(data);
 
@@ -29,10 +33,14 @@ function clickAndFollow() {
 		set_color(data);
 	});
 
-	// Deal with mouse movements
+	if (isAdmin) {
+		socket.emit('set admin',true);
+	}
+	
+	// Deal with mouse moves
 	$(function() {
 		$(document).mousemove(function(it) {
-			socket.send({
+			socket.emit('move',{
 				event : 'mousemove',
 				x : it.pageX,
 				y : it.pageY,
@@ -40,4 +48,6 @@ function clickAndFollow() {
 			});
 		});
 	});
+	
+	
 }
